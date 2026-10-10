@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS Introduction</title>
+<meta name="description" content="Doubt session notes: Introduction to Database Management Systems">
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --fg: #1f2328;
+    --muted: #5d636b;
+    --line: #d9dbde;
+    --accent: #2b5fd9;
+    --soft: #eef2fb;
+    --box: #e3ecf8;
+    --card: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171a;
+      --fg: #e6e8eb;
+      --muted: #9aa1a9;
+      --line: #33373d;
+      --accent: #7aa2ff;
+      --soft: #1d2533;
+      --box: #22324a;
+      --card: #1b1e22;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15171a; --fg: #e6e8eb; --muted: #9aa1a9; --line: #33373d;
+    --accent: #7aa2ff; --soft: #1d2533; --box: #22324a; --card: #1b1e22;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 16px 80px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+  .kicker { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 6px 0 6px; }
+  .meta { color: var(--muted); font-size: 15px; margin: 0; }
+  h2 { font-size: 22px; margin: 48px 0 10px; padding-top: 8px; }
+  h2 .num { color: var(--accent); margin-right: 8px; font-variant-numeric: tabular-nums; }
+  h3 { font-size: 18px; margin: 28px 0 6px; }
+  p { margin: 10px 0; }
+  ul { padding-left: 22px; margin: 10px 0; }
+  li { margin: 6px 0; }
+  strong { font-weight: 600; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+  nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; font-size: 15px; }
+  nav.toc ol { margin: 6px 0 0; padding-left: 20px; columns: 2; column-gap: 28px; }
+  nav.toc li { margin: 3px 0; break-inside: avoid; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .note { background: var(--soft); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 14px 0; }
+  .ask { border: 1px dashed var(--accent); border-radius: 8px; padding: 10px 14px; margin: 14px 0; font-size: 15.5px; }
+  .ask b { color: var(--accent); }
+  dl.grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 14px 0; }
+  dl.grid > div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+  dl.grid dt { font-weight: 600; }
+  dl.grid dd { margin: 4px 0 0; color: var(--fg); }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 14px 0; }
+  th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 8px 10px; vertical-align: top; }
+  th { font-weight: 600; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+  .tablewrap { overflow-x: auto; }
+  figure { margin: 22px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { color: var(--muted); font-size: 14px; text-align: center; margin-top: 8px; }
+  svg .b { fill: var(--box); stroke: var(--fg); stroke-width: 1; }
+  svg .w { fill: var(--card); stroke: var(--fg); stroke-width: 1; }
+  svg .d { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 5 4; }
+  svg .l { stroke: var(--fg); stroke-width: 1; fill: none; }
+  svg text { fill: var(--fg); font: 12px -apple-system, "Segoe UI", sans-serif; text-anchor: middle; }
+  svg .lbl { fill: var(--muted); font-size: 11px; }
+  svg .tag { text-anchor: end; fill: var(--muted); font-size: 12px; }
+  .acid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
+  .acid div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px; text-align: center; font-size: 14px; }
+  .acid b { display: block; font-size: 22px; color: var(--accent); }
+  .theme { position: fixed; top: 12px; right: 12px; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 20px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    h1 { font-size: 26px; }
+    nav.toc ol { columns: 1; }
+    .acid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<button class="theme" id="themeBtn" aria-label="Toggle theme">◐ Theme</button>
+<div class="wrap">
+
+<header>
+  <p class="kicker">DBMS · Doubt Session</p>
+  <h1>Introduction to Database Management Systems</h1>
+  <p class="meta">Based on lecture notes by Instructor Nitin Awathare · July 29, 2026</p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#what">What is a DBMS?</a></li>
+    <li><a href="#file">File-processing systems & drawbacks</a></li>
+    <li><a href="#system">Database system</a></li>
+    <li><a href="#abstraction">Data abstraction</a></li>
+    <li><a href="#schema">Schema & instances</a></li>
+    <li><a href="#models">Data models</a></li>
+    <li><a href="#languages">Database languages</a></li>
+    <li><a href="#storage">Data storage & querying</a></li>
+    <li><a href="#transactions">Transactions</a></li>
+    <li><a href="#architecture">Database architecture</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<h2 id="what"><span class="num">01</span>What is a DBMS?</h2>
+<p>A <strong>Database Management System (DBMS)</strong> is a software suite designed to efficiently manage and access a structured collection of interrelated data, known as a <strong>database</strong>. This data typically represents information relevant to a particular enterprise or domain.</p>
+<p>The primary objective of a DBMS is to make storage, retrieval and management of this information <strong>convenient</strong> and <strong>efficient</strong>.</p>
+
+<!-- 2 -->
+<h2 id="file"><span class="num">02</span>File-processing systems & their drawbacks</h2>
+<p>Database systems emerged to overcome the limits of early computerized data management. In the 1960s, universities stored information about instructors, students, departments and courses in plain operating-system files, and <strong>application programs</strong> were written to manipulate those files.</p>
+<p>As needs evolved (e.g. introducing a new major like computer science), new programs and files were added. Over time the system grew more complex, with many files and custom programs for reading and writing records. Before DBMSs, this was the standard approach.</p>
+
+<dl class="grid">
+  <div><dt>1. Data redundancy & inconsistency</dt>
+  <dd>Programs and files developed independently use different formats. The same data gets duplicated — a double-major student's contact details stored in both departments. This raises storage cost and causes inconsistency when updates are not applied everywhere.</dd></div>
+  <div><dt>2. Difficulty in accessing data</dt>
+  <dd>A clerk wants students in a specific postal code — no program exists. Either filter a full list by hand or ask for a new program. A follow-up request (only students with 60+ credits) needs yet another program. No flexible, ad hoc retrieval.</dd></div>
+  <div><dt>3. Integrity problems</dt>
+  <dd>Consistency constraints (e.g. a department's account balance must never go below zero) are buried in application code. Adding a new constraint means changing many programs — especially hard when constraints span multiple files.</dd></div>
+  <div><dt>4. Atomicity problems</dt>
+  <dd>Transferring 500 from department A to B may debit A, then crash before crediting B. Both must happen together or not at all. All-or-nothing behaviour is hard to guarantee with plain files.</dd></div>
+  <div><dt>5. Concurrent-access anomalies</dt>
+  <dd>Two clerks debit (500 and 100) a balance of 10,000 at nearly the same time. Both read 10,000 and write back 9500 or 9900 — instead of the correct 9400. Similarly, two students registering when the count is 39 both write 40, breaking the limit and losing one registration.</dd></div>
+  <div><dt>6. Security problems</dt>
+  <dd>Not every user should see all data — payroll staff shouldn't see academic records. With ad hoc programs piling up, enforcing access control is difficult.</dd></div>
+</dl>
+<p>These challenges led to the development of database systems.</p>
+
+<!-- 3 -->
+<h2 id="system"><span class="num">03</span>Database system</h2>
+<p>A database system consists of <strong>interrelated data</strong> plus <strong>software</strong> that lets users access and modify that data, while hiding the complexity of how it is stored. A key goal is to present an <strong>abstract view</strong> of the data, shielding users from low-level details.</p>
+
+<!-- 4 -->
+<h2 id="abstraction"><span class="num">04</span>Data abstraction — three levels</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Level</th><th>What it describes</th><th>Who works here</th></tr></thead>
+  <tbody>
+    <tr><td><strong>View</strong> (highest)</td><td>Only a portion of the database, tailored to a user or application. Hides logical structure and enforces security.</td><td>End users, via application screens / queries</td></tr>
+    <tr><td><strong>Logical</strong></td><td><em>What</em> data is stored and the relationships among it, independent of physical storage.</td><td>Database administrators, developers</td></tr>
+    <tr><td><strong>Physical</strong> (lowest)</td><td><em>How</em> data is actually stored, using complex low-level data structures (bytes, disk blocks).</td><td>Handled by the database system</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Analogy with programming-language types</h3>
+<pre>type instructor = record
+    ID        : char(5);
+    name      : char(20);
+    dept_name : char(20);
+    salary    : numeric(8,2);
+end;</pre>
+<p>Other record types in the same university example:</p>
+<ul>
+  <li><code>department</code> — (dept_name, building, budget)</li>
+  <li><code>course</code> — (course_id, title, dept_name, credits)</li>
+  <li><code>student</code> — (ID, name, dept_name, tot_cred)</li>
+</ul>
+<ul>
+  <li><strong>Physical:</strong> these records become blocks of storage — programmers usually don't see this.</li>
+  <li><strong>Logical:</strong> the structure of each record type and their relationships are defined, like type definitions in code.</li>
+  <li><strong>View:</strong> registrar clerks may see student information, but <em>not</em> instructor salaries.</li>
+</ul>
+
+<!-- 5 -->
+<h2 id="schema"><span class="num">05</span>Schema & instances</h2>
+<p>As data is inserted or deleted, the database changes. The data stored at a specific moment is an <strong>instance</strong>. The overall structure is the <strong>schema</strong>, which changes rarely.</p>
+<div class="note"><strong>Analogy:</strong> schema ≈ variable declarations (with types); instance ≈ the values of those variables at a point during execution.</div>
+<ul>
+  <li><strong>Physical schema</strong> — how data is actually stored.</li>
+  <li><strong>Logical schema</strong> — what data is stored and relationships among it. Most important for applications, since programs depend on it.</li>
+  <li><strong>View schemas (subschemas)</strong> — how different users see subsets of the data.</li>
+</ul>
+<p>The physical schema can usually change without affecting programs. When application programs don't depend on the physical schema and need not be rewritten if it changes, the system exhibits <strong>physical data independence</strong>.</p>
+
+<!-- 6 -->
+<h2 id="models"><span class="num">06</span>Data models</h2>
+<p>A <strong>data model</strong> is a conceptual framework describing a database's structure — data, relationships, constraints and semantics — across the physical, logical and view levels.</p>
+<dl class="grid">
+  <div><dt>Relational model</dt><dd>Data in tables (relations) of rows and columns. Record-based: each table stores fixed-format records. The most widely used model today.</dd></div>
+  <div><dt>Entity–Relationship (ER) model</dt><dd>Describes the database with entities and relationships among them. Commonly used for conceptual design.</dd></div>
+  <div><dt>Object-oriented model</dt><dd>Extends the ER model with OOP ideas: encapsulation, methods, object identity.</dd></div>
+  <div><dt>Object–relational model</dt><dd>Combines object-oriented features with the relational model; supported by several modern systems.</dd></div>
+  <div><dt>Semistructured model</dt><dd>Data items of the same type may have different attributes. XML is widely used to represent such data.</dd></div>
+</dl>
+<p>Older <strong>hierarchical</strong> and <strong>network</strong> models preceded the relational model but were tightly tied to implementation details. They are rarely used today and are not covered in this course.</p>
+
+<!-- 7 -->
+<h2 id="languages"><span class="num">07</span>Database languages</h2>
+<p>A database system provides a <strong>DDL</strong> to define the schema and a <strong>DML</strong> to query and update data. In practice both are part of one language, such as <strong>SQL</strong>.</p>
+
+<h3>Data-Manipulation Language (DML)</h3>
+<p>Used to retrieve, insert, delete or modify data.</p>
+<ul>
+  <li><strong>Procedural DML</strong> — user specifies <em>what</em> data is needed <em>and how</em> to get it.</li>
+  <li><strong>Declarative DML</strong> — user specifies only <em>what</em> is needed; the system figures out how. Easier to use, but the DBMS must optimize data access.</li>
+</ul>
+<p>A <strong>query</strong> is a DML statement that retrieves data; the query part of a DML is often just called a <strong>query language</strong>.</p>
+
+<h3>Data-Definition Language (DDL)</h3>
+<p>Defines the schema, storage structures, access methods and constraints. Common integrity constraints:</p>
+<ul>
+  <li><strong>Domain constraints</strong> — restrict allowed values for an attribute.</li>
+  <li><strong>Referential integrity</strong> — values in one relation must correspond to values in another.</li>
+  <li><strong>Assertions</strong> — general conditions that must always hold.</li>
+  <li><strong>Authorization</strong> — which access (read, insert, update, delete) each user has.</li>
+</ul>
+<p>This metadata lives in the <strong>data dictionary</strong>, which the system consults before any data access or modification.</p>
+<div class="ask"><b>Think about it:</b> the <strong>DDL interpreter</strong> parses and records schema definitions in the data dictionary, while the <strong>DML compiler</strong> translates queries into a low-level execution plan for the query engine. Why is one <em>interpreted</em> and the other <em>compiled</em>?</div>
+
+<!-- 8 -->
+<h2 id="storage"><span class="num">08</span>Data storage & querying</h2>
+<p>A database system has two main components:</p>
+<ul>
+  <li><strong>Storage manager</strong> — interface between low-level data and applications. Manages GBs–TBs of data on disk (main memory can't hold it all), organizes it to reduce costly disk I/O, and translates DML into file-system commands.</li>
+  <li><strong>Query processor</strong> — translates high-level, nonprocedural queries and updates into efficient low-level operations, so users think in logical views, not physical storage.</li>
+</ul>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Storage manager components</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>Authorization & integrity manager</td><td>Checks access rights; enforces integrity constraints</td></tr>
+    <tr><td>Transaction manager</td><td>Keeps the database consistent during failures; ensures conflict-free concurrent transactions</td></tr>
+    <tr><td>File manager</td><td>Allocates disk space; organizes on-disk data structures</td></tr>
+    <tr><td>Buffer manager</td><td>Moves data between disk and memory; decides what to cache. Critical when the database is much larger than memory</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Data structures maintained by the storage manager:</p>
+<ul>
+  <li><strong>Data files</strong> — the database itself.</li>
+  <li><strong>Data dictionary</strong> — metadata, especially the schema.</li>
+  <li><strong>Indices</strong> — map values to record locations for fast access (e.g. find an instructor by ID or name). Hashing is an alternative — faster in some cases, but not all.</li>
+</ul>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Query processor components</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>DDL interpreter</td><td>Interprets DDL statements; records definitions in the data dictionary</td></tr>
+    <tr><td>DML compiler</td><td>Turns DML into an evaluation plan of low-level instructions. Since many equivalent plans exist, it performs <strong>query optimization</strong> to pick the most efficient</td></tr>
+    <tr><td>Query evaluation engine</td><td>Executes the low-level instructions to produce results</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 9 -->
+<h2 id="transactions"><span class="num">09</span>Transactions</h2>
+<p>Several operations often form one logical unit of work. Transferring funds from account A to B needs both a debit and a credit — together or not at all.</p>
+<p>A <strong>transaction</strong> is a sequence of operations that performs a single logical function and must satisfy:</p>
+<div class="acid">
+  <div><b>A</b>Atomicity<br><small>all or nothing</small></div>
+  <div><b>C</b>Consistency<br><small>e.g. total balance unchanged</small></div>
+  <div><b>I</b>Isolation<br><small>concurrent runs don't interfere</small></div>
+  <div><b>D</b>Durability<br><small>effects survive failures</small></div>
+</div>
+<p>If the database is consistent before a transaction starts, it must be consistent after it finishes. Temporary inconsistency during execution is fine, but must be resolved by the end.</p>
+<div class="note">Defining transactions correctly is the <strong>programmer's</strong> job. A debit alone or a credit alone is <em>not</em> a transaction — neither moves the database from one consistent state to another.</div>
+<ul>
+  <li><strong>Recovery manager</strong> — guarantees atomicity and durability; restores the database if a transaction fails.</li>
+  <li><strong>Concurrency-control manager</strong> — preserves consistency when transactions run simultaneously.</li>
+</ul>
+<p>Together these two form the <strong>transaction manager</strong>.</p>
+
+<!-- 10 -->
+<h2 id="architecture"><span class="num">10</span>Database architecture</h2>
+<p>Architecture depends on the underlying computer system: <strong>centralized</strong>, <strong>client–server</strong> (one server, many clients), <strong>parallel</strong> (multiprocessors) or <strong>distributed</strong> (geographically separated machines).</p>
+
+<figure>
+<svg viewBox="0 0 720 660" role="img" aria-label="Components of a database system and how they interact">
+  <!-- users -->
+  <rect class="b" x="20"  y="10" width="140" height="52" rx="8"/>
+  <text x="90"  y="31">naive users</text><text x="90" y="47" class="lbl">(tellers, agents, web users)</text>
+  <rect class="b" x="200" y="10" width="140" height="52" rx="8"/>
+  <text x="270" y="31">application</text><text x="270" y="47">programmers</text>
+  <rect class="b" x="380" y="10" width="140" height="52" rx="8"/>
+  <text x="450" y="31">sophisticated users</text><text x="450" y="47" class="lbl">(analysts)</text>
+  <rect class="b" x="560" y="10" width="140" height="52" rx="8"/>
+  <text x="630" y="31">database</text><text x="630" y="47">administrators</text>
+
+  <line class="l" x1="90"  y1="62" x2="90"  y2="96"/><text x="104" y="84" class="lbl">use</text>
+  <line class="l" x1="270" y1="62" x2="270" y2="96"/><text x="286" y="84" class="lbl">write</text>
+  <line class="l" x1="450" y1="62" x2="450" y2="96"/><text x="464" y="84" class="lbl">use</text>
+  <line class="l" x1="630" y1="62" x2="630" y2="96"/><text x="644" y="84" class="lbl">use</text>
+
+  <ellipse class="w" cx="90"  cy="118" rx="66" ry="22"/><text x="90"  y="115">application</text><text x="90"  y="129">interfaces</text>
+  <ellipse class="w" cx="270" cy="118" rx="66" ry="22"/><text x="270" y="115">application</text><text x="270" y="129">programs</text>
+  <ellipse class="w" cx="450" cy="118" rx="66" ry="22"/><text x="450" y="115">query</text><text x="450" y="129">tools</text>
+  <ellipse class="w" cx="630" cy="118" rx="66" ry="22"/><text x="630" y="115">administration</text><text x="630" y="129">tools</text>
+
+  <!-- query processor -->
+  <rect class="d" x="10" y="162" width="700" height="190"/>
+  <text x="700" y="342" class="tag">query processor</text>
+  <rect class="b" x="205" y="178" width="130" height="34"/><text x="270" y="200">compiler and linker</text>
+  <rect class="b" x="385" y="178" width="130" height="34"/><text x="450" y="200">DML queries</text>
+  <rect class="b" x="565" y="178" width="130" height="34"/><text x="630" y="200">DDL interpreter</text>
+  <rect class="b" x="30"  y="232" width="130" height="44"/><text x="95" y="250">application program</text><text x="95" y="265">object code</text>
+  <rect class="b" x="385" y="232" width="130" height="44"/><text x="450" y="250">DML compiler</text><text x="450" y="265">and organizer</text>
+  <rect class="b" x="210" y="296" width="140" height="42"/><text x="280" y="314">query evaluation</text><text x="280" y="329">engine</text>
+
+  <line class="l" x1="270" y1="140" x2="270" y2="178"/>
+  <line class="l" x1="450" y1="140" x2="450" y2="178"/>
+  <line class="l" x1="630" y1="140" x2="630" y2="178"/>
+  <line class="l" x1="610" y1="138" x2="515" y2="190"/>
+  <line class="l" x1="90"  y1="140" x2="90"  y2="232"/>
+  <line class="l" x1="335" y1="195" x2="385" y2="195"/>
+  <line class="l" x1="205" y1="200" x2="160" y2="240"/>
+  <line class="l" x1="160" y1="262" x2="400" y2="212"/>
+  <line class="l" x1="450" y1="212" x2="450" y2="232"/>
+  <line class="l" x1="95"  y1="276" x2="210" y2="312"/>
+  <line class="l" x1="400" y1="276" x2="350" y2="305"/>
+
+  <!-- storage manager -->
+  <rect class="d" x="10" y="372" width="700" height="104"/>
+  <text x="700" y="466" class="tag">storage manager</text>
+  <rect class="b" x="30"  y="390" width="130" height="34"/><text x="95"  y="412">buffer manager</text>
+  <rect class="b" x="190" y="390" width="130" height="34"/><text x="255" y="412">file manager</text>
+  <rect class="b" x="385" y="390" width="130" height="52"/><text x="450" y="408">authorization</text><text x="450" y="422">and integrity</text><text x="450" y="436">manager</text>
+  <rect class="b" x="550" y="390" width="130" height="40"/><text x="615" y="407">transaction</text><text x="615" y="421">manager</text>
+
+  <line class="l" x1="260" y1="338" x2="95"  y2="390"/>
+  <line class="l" x1="275" y1="338" x2="255" y2="390"/>
+  <line class="l" x1="300" y1="338" x2="440" y2="390"/>
+  <line class="l" x1="330" y1="338" x2="600" y2="390"/>
+
+  <!-- disk -->
+  <path class="w" d="M150 512 v110 a210 26 0 0 0 420 0 v-110"/>
+  <ellipse class="w" cx="360" cy="512" rx="210" ry="26"/>
+  <text x="640" y="560" class="lbl">disk storage</text>
+  <rect class="w" x="250" y="540" width="80" height="26"/><text x="290" y="557">indices</text>
+  <rect class="w" x="360" y="540" width="110" height="26"/><text x="415" y="557">data dictionary</text>
+  <rect class="w" x="200" y="592" width="70" height="26"/><text x="235" y="609">data</text>
+  <rect class="w" x="330" y="592" width="120" height="26"/><text x="390" y="609">statistical data</text>
+
+  <line class="l" x1="80"  y1="424" x2="235" y2="592"/>
+  <line class="l" x1="110" y1="424" x2="285" y2="540"/>
+  <line class="l" x1="240" y1="424" x2="235" y2="592"/>
+  <line class="l" x1="270" y1="424" x2="295" y2="540"/>
+  <line class="l" x1="450" y1="442" x2="420" y2="540"/>
+  <line class="l" x1="470" y1="276" x2="470" y2="372"/>
+  <line class="l" x1="470" y1="476" x2="440" y2="540"/>
+</svg>
+<figcaption>Figure 1 — Components of a database system and how they interact</figcaption>
+</figure>
+
+<p>Most users access the database remotely over a network. <strong>Client machines</strong> are where users interact; <strong>server machines</strong> run the database system.</p>
+<ul>
+  <li><strong>Two-tier:</strong> the application runs on the client and talks directly to the database server using query languages, often through APIs like <strong>ODBC</strong> or <strong>JDBC</strong>.</li>
+  <li><strong>Three-tier:</strong> the client is only a front end, talking to an <strong>application server</strong> (usually via a forms interface). The application server holds the business logic and connects to the database. Better suited to large-scale and web applications.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 600 330" role="img" aria-label="Two-tier and three-tier architectures">
+  <!-- two tier -->
+  <rect class="d" x="40" y="10" width="200" height="110" rx="12"/>
+  <rect class="b" x="105" y="26" width="70" height="28" rx="6"/><text x="140" y="45">user</text>
+  <line class="l" x1="140" y1="54" x2="140" y2="78"/>
+  <rect class="b" x="80" y="78" width="120" height="28"/><text x="140" y="97">application</text>
+  <line class="l" x1="140" y1="120" x2="140" y2="200"/>
+  <text x="166" y="164" class="lbl">network</text>
+  <rect class="d" x="40" y="200" width="200" height="90" rx="12"/>
+  <rect class="b" x="75" y="232" width="130" height="28"/><text x="140" y="251">database system</text>
+  <text x="140" y="314" class="lbl">(a) Two-tier architecture</text>
+
+  <text x="300" y="70" class="lbl">client</text>
+  <text x="300" y="250" class="lbl">server</text>
+
+  <!-- three tier -->
+  <rect class="d" x="360" y="10" width="200" height="110" rx="12"/>
+  <rect class="b" x="425" y="26" width="70" height="28" rx="6"/><text x="460" y="45">user</text>
+  <line class="l" x1="460" y1="54" x2="460" y2="78"/>
+  <rect class="b" x="395" y="78" width="130" height="28"/><text x="460" y="97">application client</text>
+  <line class="l" x1="460" y1="120" x2="460" y2="200"/>
+  <text x="486" y="164" class="lbl">network</text>
+  <rect class="d" x="360" y="200" width="200" height="100" rx="12"/>
+  <rect class="b" x="395" y="212" width="130" height="28"/><text x="460" y="231">application server</text>
+  <line class="l" x1="460" y1="240" x2="460" y2="258"/>
+  <rect class="b" x="395" y="258" width="130" height="28"/><text x="460" y="277">database system</text>
+  <text x="460" y="318" class="lbl">(b) Three-tier architecture</text>
+</svg>
+<figcaption>Figure 2 — Layered architecture of applications using a database</figcaption>
+</figure>
+
+<footer>
+  <p><strong>References</strong></p>
+  <ol>
+    <li>Silberschatz, Korth & Sudarshan, <em>Database System Concepts</em> — <a href="https://www.db-book.com/">db-book.com</a></li>
+    <li>Michael J. Hernandez, <em>Database Design for Mere Mortals</em></li>
+    <li>Garcia-Molina, Ullman & Widom, <em>Database Systems: The Complete Book</em></li>
+  </ol>
+  <p>Some content and figures are adapted from the references above, for educational purposes only, with no commercial benefit.</p>
+</footer>
+
+</div>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('themeBtn');
+    try { var t = localStorage.getItem('dbms-theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme') ||
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('dbms-theme', next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>
